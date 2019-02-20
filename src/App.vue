@@ -2,40 +2,51 @@
   <div id="app">
     <h1 class="title">Dining philosophers</h1>
     <button class="btn" @click="initDinner()">Start</button>
-    <div class="table">
+    <div class="container">
+      <div class="states">
+        <pre>
+          {{ statesPhilosophers }}
+        </pre>
+      </div>
+      <div class="table">
 
-      <div class="container-philosopher">
-        <div v-for="philosopher in philosophers" :key="philosopher.id"
-          :class="`
-          philosopher
-          philosopher--${philosopher.className}
-          ${philosopher.state === 1 ? 'isDinnering' : 'nothing'}`">
-          <div :class="`info info--${philosopher.className}`">
-            <label class="info__name">{{ philosopher.name }}</label>
-            <label class="info__rations">{{ philosopher.rations }}</label>
+        <div class="container-philosopher">
+          <div v-for="philosopher in philosophers" :key="philosopher.id"
+            :class="`
+            philosopher
+            philosopher--${philosopher.className}
+            ${philosopher.state === 1
+              ? 'isDinnering'
+              : philosopher.state === 2
+              ? 'isThinking'
+              : 'isWaiting'}`">
+            <div :class="`info info--${philosopher.className}`">
+              <label class="info__name">{{ philosopher.name }}</label>
+              <label class="info__rations">{{ philosopher.rations }}</label>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="container-fork">
-        <div v-for="fork in forks" :key="fork.id"
-          :class="`
-          fork
-          fork--${fork.name}
-          ${fork.isOcuped ? 'isDinnering' : ''}`">
+        <div class="container-fork">
+          <div v-for="fork in forks" :key="fork.id"
+            :class="`
+            fork
+            fork--${fork.name}
+            ${fork.isOcuped ? 'isDinnering' : ''}`">
+          </div>
         </div>
-      </div>
-      <pre style="text-align: center">
-        {{ g }}
-      </pre>
+        <pre style="text-align: center">
+          {{ g }}
+        </pre>
 
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 const rations = 5
-const transitionTime = 1500
+const transitionTime = 2000
 
 export default {
   name: 'app',
@@ -58,42 +69,43 @@ export default {
       ],
       states: ['isDinnering', 'isWaiting', 'isSated'],
       x: 0,
-      y: 0
+      y: 0,
+      lastOne: 0,
+      lastTwo: 0,
+      flag: false
     }
-  },
-
-  mounted () {
-    let that = this
-    // this.dinnering(0)
-    // setTimeout(() => {
-    //   this.clean(0)
-    //   this.changeState(4, 'isSated')
-    //   this.test()
-    // }, 2000)    
   },
 
   computed: {
     g () {
       return `${this.x}  ${this.y}`
+    },
+    statesPhilosophers () {
+      return this.philosophers[0].state
     }
   },
 
+
   methods: {
     initDinner () {
-      async function wait() {
-      return new Promise(function(resolve) {
-        setTimeout(resolve, transitionTime);
+      let that = this
+      async function wait () {
+        return new Promise((resolve) => {
+          console.log('lastOne ', that.lastOne)
+          console.log('lastTwo ', that.lastTwo)
+          setTimeout(resolve, transitionTime)
         })
       }
 
       (async () => {
-        while (true) {      
-          await wait();
+        while (true) {
+          await wait()
           this.getPartner()
+          // this.philosophers[this.lastOne].state = 2
+          // this.philosophers[this.lastTwo].state = 2
         }
       })()
     },
-
 
     initx () {
       for (let index = 0; index < 20; index++) {
@@ -122,32 +134,43 @@ export default {
         this.philosophers[index].state = 0
         this.forks[ this.philosophers[index].forks[0] ].isOcuped = false
         this.forks[ this.philosophers[index].forks[1] ].isOcuped = false
-        
       }
       this.philosophers[x].state = 1
-      this.philosophers[x].rations--
+      this.discountRation(x)
       this.forks[ this.philosophers[x].forks[0] ].isOcuped = true
       this.forks[ this.philosophers[x].forks[1] ].isOcuped = true
       this.philosophers[y].state = 1
-      this.philosophers[y].rations--
+      this.discountRation(y)
       this.forks[ this.philosophers[y].forks[0] ].isOcuped = true
       this.forks[ this.philosophers[y].forks[1] ].isOcuped = true
+
+      if (this.flag) {
+        if (x === 0) x = 4
+        else x--
+        if (y === 0) y = 4
+        else y--
+        this.philosophers[x].state = 2
+        this.philosophers[y].state = 2
+      }
+      this.flag = true
     },
 
     clean (id) {
       this.philosophers[id].state = 0
-      // this.philosophers[id].rations--
       this.forks[ this.philosophers[id].forks[0] ].isOcuped = false
       this.forks[ this.philosophers[id].forks[1] ].isOcuped = false
     },
 
     getPartner () {
-        if (this.x > 2) this.y = this.x - 3
-        else this.y = this.x + 2
-        this.dinnering(this.x, this.y)
-        this.x++
-        if (this.x === 5) this.x = 0
-        
+      if (this.x > 2) this.y = this.x - 3
+      else this.y = this.x + 2
+      this.dinnering(this.x, this.y)
+      this.x++
+      if (this.x === 5) this.x = 0
+    },
+
+    discountRation (index) {
+      this.philosophers[index].rations--
     }
   }
 }
@@ -172,10 +195,16 @@ $mapNumbers: (
 );
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;  
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   display: grid;
   grid-gap: 1em;
   justify-content: center;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  margin: 0 auto;
 }
 
 .table {
@@ -282,11 +311,13 @@ $mapNumbers: (
   background-color: green;
   transition: all 1s;
 }
-.isWaiting {
+.isThinking {
   background-color: orange;
+  transition: all 1s;
 }
-.isSated {
+.isWaiting {
   background-color: red;
+  transition: all 1s;
 }
 .nothing {
   background-color: whitesmoke;
