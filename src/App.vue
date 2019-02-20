@@ -85,7 +85,6 @@ export default {
     }
   },
 
-
   methods: {
     initDinner () {
       let that = this
@@ -126,7 +125,7 @@ export default {
       this.philosophers[index].rations--
       this.forks[ this.philosophers[index].forks[0] ].isOcuped = false
       this.forks[ this.philosophers[index].forks[1] ].isOcuped = false
-      console.log(this.philosophers[index].rations)
+      // console.log(this.philosophers[index].rations)
     },
 
     dinnering (x, y) {
@@ -170,7 +169,17 @@ export default {
     },
 
     discountRation (index) {
-      this.philosophers[index].rations--
+      if (this.philosophers[index].rations > 0) {
+        this.philosophers[index].rations--
+      }
+    },
+
+    // TODO: if everyone philosopher has finished
+    checkStates () {
+      let checker = this.philosophers.forEach( (philosopher) => {
+        // if (philosopher.rations > 0)
+      })
+
     }
   }
 }
