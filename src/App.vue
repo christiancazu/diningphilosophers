@@ -1,8 +1,13 @@
 <template>
   <div id="app">
     <h1 class="title">Dining philosophers</h1>
-    <button class="btn" @click="initDinner();">Start</button>
+    <button class="btn" @click="initDinner();"><h2>START</h2></button>
     <div class="container">
+      <div class="state-indicator">
+        <h2 class="state-indicator__info">dinnering</h2>
+        <h2 class="state-indicator__info">thinking</h2>
+        <h2 class="state-indicator__info">waiting</h2>
+      </div>
       <div class="table-rounded">
         <div class="container-philosopher">
           <div
@@ -177,6 +182,35 @@ $mapNumbers: (one, two, three, four, five);
   grid-template-columns: 1fr 3fr;
   margin: 0 auto;
 }
+.state-indicator {
+  display: flex;
+  flex-direction: column;
+  &__info:before {
+    display: inline-block;
+    color: inherit;
+    border-radius: 50%;
+    content: "";
+    width: 1em;
+    height: 1em;
+    margin-right: 0.25em;
+    border: 1px solid black;
+  }
+  &__info:nth-child(1) {
+    &:before {
+      background-color: green;
+    }
+  }
+  &__info:nth-child(2) {
+    &:before {
+      background-color: orange;
+    }
+  }
+  &__info:nth-child(3) {
+    &:before {
+      background-color: red;
+    }
+  }
+}
 
 .table-rounded {
   position: relative;
@@ -185,6 +219,8 @@ $mapNumbers: (one, two, three, four, five);
   height: $table-roundedSize;
   margin: auto;
   border-radius: 50%;
+  justify-content: center;
+  border: 1px solid black;
 }
 
 .container-fork {
@@ -292,8 +328,8 @@ $mapNumbers: (one, two, three, four, five);
 
 .btn {
   justify-self: center;
-  background-color: tomato;
-  padding: 1em 2em;
+  width: 50%;
+  background-color: #00bfff;
   color: white;
   display: block;
   cursor: pointer;
