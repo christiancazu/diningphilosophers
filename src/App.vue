@@ -3,12 +3,11 @@
     <h1 class="title">Dining philosophers</h1>
     <button class="btn" @click="initDinner();">Start</button>
     <div class="container">
-      <div class="states"><div class="stateDescription"></div></div>
-      <div class="table">
+      <div class="table-rounded">
         <div class="container-philosopher">
           <div
-            v-for="philosopher in philosophers"
-            :key="philosopher.id"
+            v-for="(philosopher, index) in philosophers"
+            :key="index"
             :class="
               `
             philosopher
@@ -24,9 +23,6 @@
           >
             <div :class="`info info--${philosopher.className}`">
               <label class="info__name">{{ philosopher.name }}</label>
-              <!--
-                <label class="info__rations">{{ philosopher.rations }}</label>
-              -->
             </div>
           </div>
         </div>
@@ -104,12 +100,6 @@ export default {
     };
   },
 
-  computed: {
-    statesPhilosophers() {
-      return this.philosophers[0].state;
-    }
-  },
-
   methods: {
     initDinner() {
       (async () => {
@@ -162,8 +152,8 @@ export default {
 </script>
 
 <style lang="scss">
-$tableSize: 28em;
-$tableColor: gray;
+$table-roundedSize: 28em;
+$table-roundedColor: gray;
 $philosopherSize: 9em;
 $philosopherColor: white;
 $forkSize: 3em;
@@ -188,18 +178,18 @@ $mapNumbers: (one, two, three, four, five);
   margin: 0 auto;
 }
 
-.table {
+.table-rounded {
   position: relative;
-  background-color: $tableColor;
-  width: $tableSize;
-  height: $tableSize;
+  background-color: $table-roundedColor;
+  width: $table-roundedSize;
+  height: $table-roundedSize;
   margin: auto;
   border-radius: 50%;
 }
 
 .container-fork {
-  height: $tableSize;
-  width: $tableSize;
+  height: $table-roundedSize;
+  width: $table-roundedSize;
   position: absolute;
   top: 0;
   transform: rotate(36deg);
@@ -214,7 +204,6 @@ $mapNumbers: (one, two, three, four, five);
   top: 25%;
   left: calc(50% - #{$forkSize / 6});
   transform: translate(0, 0);
-  //left: calc(50% - (#{$forkSize / 5}));
   transform-origin: center 7em;
   &::before {
     content: "";
@@ -229,8 +218,8 @@ $mapNumbers: (one, two, three, four, five);
 }
 
 .container-philosopher {
-  height: $tableSize;
-  width: $tableSize;
+  height: $table-roundedSize;
+  width: $table-roundedSize;
   position: relative;
 }
 
@@ -281,7 +270,7 @@ $mapNumbers: (one, two, three, four, five);
   align-items: center;
   font-weight: 900;
   &__name {
-    //
+    color: white;
   }
   &__rations {
     font-size: 1.5em;
@@ -300,13 +289,8 @@ $mapNumbers: (one, two, three, four, five);
   background-color: red;
   transition: all 1s;
 }
-.nothing {
-  background-color: whitesmoke;
-  transition: all 1s;
-}
 
 .btn {
-  // margin-top: 1em;
   justify-self: center;
   background-color: tomato;
   padding: 1em 2em;
