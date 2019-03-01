@@ -1,188 +1,162 @@
 <template>
   <div id="app">
     <h1 class="title">Dining philosophers</h1>
-    <button class="btn" @click="initDinner()">Start</button>
+    <button class="btn" @click="initDinner();">Start</button>
     <div class="container">
-      <div class="states">
-        <pre>
-          {{ statesPhilosophers }}
-        </pre>
-      </div>
+      <div class="states"><div class="stateDescription"></div></div>
       <div class="table">
-
         <div class="container-philosopher">
-          <div v-for="philosopher in philosophers" :key="philosopher.id"
-            :class="`
+          <div
+            v-for="philosopher in philosophers"
+            :key="philosopher.id"
+            :class="
+              `
             philosopher
             philosopher--${philosopher.className}
-            ${philosopher.state === 1
-              ? 'isDinnering'
-              : philosopher.state === 2
-              ? 'isThinking'
-              : 'isWaiting'}`">
+            ${
+              philosopher.state === 1
+                ? 'isDinnering'
+                : philosopher.state === 2
+                ? 'isThinking'
+                : 'isWaiting'
+            }`
+            "
+          >
             <div :class="`info info--${philosopher.className}`">
               <label class="info__name">{{ philosopher.name }}</label>
-              <label class="info__rations">{{ philosopher.rations }}</label>
+              <!--
+                <label class="info__rations">{{ philosopher.rations }}</label>
+              -->
             </div>
           </div>
         </div>
 
         <div class="container-fork">
-          <div v-for="fork in forks" :key="fork.id"
-            :class="`
+          <div
+            v-for="fork in forks"
+            :key="fork.id"
+            :class="
+              `
             fork
             fork--${fork.name}
-            ${fork.isOcuped ? 'isDinnering' : ''}`">
-          </div>
+            ${fork.isOcuped ? 'isDinnering' : ''}`
+            "
+          ></div>
         </div>
-        <pre style="text-align: center">
-          {{ g }}
-        </pre>
-
       </div>
     </div>
   </div>
 </template>
 
 <script>
-const rations = 5
-const transitionTime = 2000
+const transitionTime = 2000;
 
 export default {
-  name: 'app',
+  name: "app",
 
-  data () {
+  data() {
     return {
       philosophers: [
-        { id: 0, className: 'socrates', name: 'SÓCRATES', state: 0, forks: [0, 4], rations: rations },
-        { id: 1, className: 'platon', name: 'PLATÓN', state: 0, forks: [0, 1], rations: rations },
-        { id: 2, className: 'aristoteles', name: 'ARISTÓTELES', state: 0, forks: [1, 2], rations: rations },
-        { id: 3, className: 'heraclito', name: 'HERACLITO', state: 0, forks: [2, 3], rations: rations },
-        { id: 4, className: 'pitagoras', name: 'PITÁGORAS', state: 0, forks: [3, 4], rations: rations }
+        {
+          className: "socrates",
+          name: "SÓCRATES",
+          state: 0,
+          forks: [0, 4]
+        },
+        {
+          className: "platon",
+          name: "PLATÓN",
+          state: 0,
+          forks: [0, 1]
+        },
+        {
+          className: "aristoteles",
+          name: "ARISTÓTELES",
+          state: 0,
+          forks: [1, 2]
+        },
+        {
+          className: "heraclito",
+          name: "HERACLITO",
+          state: 0,
+          forks: [2, 3]
+        },
+        {
+          className: "pitagoras",
+          name: "PITÁGORAS",
+          state: 0,
+          forks: [3, 4]
+        }
       ],
       forks: [
-        { id: 0, name: 'one', isOcuped: false },
-        { id: 1, name: 'two', isOcuped: false },
-        { id: 2, name: 'three', isOcuped: false },
-        { id: 3, name: 'four', isOcuped: false },
-        { id: 4, name: 'five', isOcuped: false }
+        { name: "one", isOcuped: false },
+        { name: "two", isOcuped: false },
+        { name: "three", isOcuped: false },
+        { name: "four", isOcuped: false },
+        { name: "five", isOcuped: false }
       ],
-      states: ['isDinnering', 'isWaiting', 'isSated'],
+      states: ["isDinnering", "isWaiting", "isSated"],
       x: 0,
       y: 0,
-      lastOne: 0,
-      lastTwo: 0,
-      flag: false
-    }
+      flagFirstTurn: false
+    };
   },
 
   computed: {
-    g () {
-      return `${this.x}  ${this.y}`
-    },
-    statesPhilosophers () {
-      return this.philosophers[0].state
+    statesPhilosophers() {
+      return this.philosophers[0].state;
     }
   },
 
   methods: {
-    initDinner () {
-      let that = this
-      async function wait () {
-        return new Promise((resolve) => {
-          console.log('lastOne ', that.lastOne)
-          console.log('lastTwo ', that.lastTwo)
-          setTimeout(resolve, transitionTime)
-        })
-      }
-
+    initDinner() {
       (async () => {
         while (true) {
-          await wait()
-          this.getPartner()
-          // this.philosophers[this.lastOne].state = 2
-          // this.philosophers[this.lastTwo].state = 2
+          await wait();
+          this.getPartner();
         }
-      })()
-    },
+      })();
 
-    initx () {
-      for (let index = 0; index < 20; index++) {
-        (() => {
-          this.getPartner()
-        })(index)
+      async function wait() {
+        return new Promise(resolve => {
+          setTimeout(resolve, transitionTime);
+        });
       }
     },
 
-    init () {
-      this.philosophers[3].state = 1
-      this.forks[ this.philosophers[3].forks[0] ].isOcuped = true
-      this.forks[ this.philosophers[3].forks[1] ].isOcuped = true
-    },
-
-    changeState (index, state) {
-      this.philosophers[index].state = 0
-      this.philosophers[index].rations--
-      this.forks[ this.philosophers[index].forks[0] ].isOcuped = false
-      this.forks[ this.philosophers[index].forks[1] ].isOcuped = false
-      // console.log(this.philosophers[index].rations)
-    },
-
-    dinnering (x, y) {
+    dinnering(x, y) {
       for (let index = 0; index < this.philosophers.length; index++) {
-        this.philosophers[index].state = 0
-        this.forks[ this.philosophers[index].forks[0] ].isOcuped = false
-        this.forks[ this.philosophers[index].forks[1] ].isOcuped = false
+        this.philosophers[index].state = 0;
+        this.forks[this.philosophers[index].forks[0]].isOcuped = false;
+        this.forks[this.philosophers[index].forks[1]].isOcuped = false;
       }
-      this.philosophers[x].state = 1
-      this.discountRation(x)
-      this.forks[ this.philosophers[x].forks[0] ].isOcuped = true
-      this.forks[ this.philosophers[x].forks[1] ].isOcuped = true
-      this.philosophers[y].state = 1
-      this.discountRation(y)
-      this.forks[ this.philosophers[y].forks[0] ].isOcuped = true
-      this.forks[ this.philosophers[y].forks[1] ].isOcuped = true
+      this.philosophers[x].state = 1;
+      this.forks[this.philosophers[x].forks[0]].isOcuped = true;
+      this.forks[this.philosophers[x].forks[1]].isOcuped = true;
+      this.philosophers[y].state = 1;
+      this.forks[this.philosophers[y].forks[0]].isOcuped = true;
+      this.forks[this.philosophers[y].forks[1]].isOcuped = true;
 
-      if (this.flag) {
-        if (x === 0) x = 4
-        else x--
-        if (y === 0) y = 4
-        else y--
-        this.philosophers[x].state = 2
-        this.philosophers[y].state = 2
+      if (this.flagFirstTurn) {
+        if (x === 0) x = 4;
+        else x--;
+        if (y === 0) y = 4;
+        else y--;
+        this.philosophers[x].state = 2;
+        this.philosophers[y].state = 2;
       }
-      this.flag = true
+      this.flagFirstTurn = true;
     },
 
-    clean (id) {
-      this.philosophers[id].state = 0
-      this.forks[ this.philosophers[id].forks[0] ].isOcuped = false
-      this.forks[ this.philosophers[id].forks[1] ].isOcuped = false
-    },
-
-    getPartner () {
-      if (this.x > 2) this.y = this.x - 3
-      else this.y = this.x + 2
-      this.dinnering(this.x, this.y)
-      this.x++
-      if (this.x === 5) this.x = 0
-    },
-
-    discountRation (index) {
-      if (this.philosophers[index].rations > 0) {
-        this.philosophers[index].rations--
-      }
-    },
-
-    // TODO: if everyone philosopher has finished
-    checkStates () {
-      let checker = this.philosophers.forEach( (philosopher) => {
-        // if (philosopher.rations > 0)
-      })
-
+    getPartner() {
+      if (this.x > 2) this.y = this.x - 3;
+      else this.y = this.x + 2;
+      this.dinnering(this.x, this.y);
+      this.x++;
+      if (this.x === 5) this.x = 0;
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -195,16 +169,12 @@ $forkColor: white;
 
 $baseRotation: 72;
 
-$mapPhilosophers: (
-  socrates, platon, aristoteles, heraclito, pitagoras
-);
+$mapPhilosophers: (socrates, platon, aristoteles, heraclito, pitagoras);
 
-$mapNumbers: (
-  one, two, three, four, five
-);
+$mapNumbers: (one, two, three, four, five);
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   display: grid;
   grid-gap: 1em;
   justify-content: center;
