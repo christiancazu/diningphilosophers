@@ -33,15 +33,17 @@
 
         <div class="container-fork">
           <div
-            v-for="fork in forks"
-            :key="fork.id"
+            v-for="(fork, index) in forks"
+            :key="index"
             :class="
               `
             fork
             fork--${fork.name}
             ${fork.isOcuped ? 'isDinnering' : ''}`
             "
-          ></div>
+          >
+            {{ index }}
+          </div>
         </div>
       </div>
     </div>
